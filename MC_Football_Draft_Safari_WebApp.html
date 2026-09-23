@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="M&C Draft">
+<meta name="theme-color" content="#07111f">
+<title>M&C Football Draft</title>
+<style>
+:root{--bg:#07111f;--panel:#101d30;--panel2:#16263d;--line:#263c58;--text:#f5f7fb;--muted:#9eb0c8;--accent:#49d17d;--accent2:#4ea1ff;--danger:#ff5d68;--gold:#ffd166}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;min-height:100%;overscroll-behavior:none}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);touch-action:manipulation}
+button,input,select{font:inherit}
+button{border:0;cursor:pointer;color:var(--text)}
+.app{max-width:1250px;margin:auto;padding:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#49d17d,#4ea1ff);display:grid;place-items:center;font-weight:900;color:#06111d}
+h1{font-size:22px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{min-height:44px;padding:10px 14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:750}
+.btn.primary{background:var(--accent);color:#06130b;border-color:transparent}.btn.blue{background:var(--accent2);color:#06111d;border-color:transparent}.btn.danger{background:#30151b;border-color:#63303a;color:#ff9da5}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.card h2{font-size:15px;margin:0;padding:13px 14px;border-bottom:1px solid var(--line)}
+.cardbody{padding:12px}
+.setup{display:grid;gap:10px}
+label{font-size:12px;color:var(--muted);font-weight:700}
+input,select{width:100%;min-height:46px;background:#091626;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:16px;outline:none}
+input:focus,select:focus{border-color:var(--accent2)}
+.row{display:grid;grid-template-columns:1fr 110px;gap:8px}
+.status{padding:11px 12px;border-radius:12px;background:#0b1728;border:1px solid var(--line);font-weight:800}
+.turn{color:var(--gold)}
+.positionTabs{display:flex;gap:6px;overflow:auto;padding-bottom:4px}.tab{white-space:nowrap;padding:8px 10px;border-radius:9px;background:#0b1728;border:1px solid var(--line);font-size:12px;font-weight:800}.tab.active{background:var(--accent2);color:#06111d}
+.pool{display:grid;gap:7px;max-height:62vh;overflow:auto;padding-right:2px}
+.player{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:11px;background:#0b1728;border:1px solid #1c3049;min-height:46px}
+.player.available{cursor:pointer}.player.available:active{transform:scale(.985);background:#10233b}
+.pname{font-weight:800}.ppos{font-size:11px;color:var(--muted);margin-top:2px}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:20px 8px}
+.pitchWrap{padding:12px}
+.pitch{position:relative;min-height:680px;border-radius:16px;overflow:hidden;background:
+radial-gradient(circle at 50% 50%,rgba(255,255,255,.04) 0 68px,transparent 69px),
+repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 54px,rgba(0,0,0,.03) 54px 108px),
+linear-gradient(90deg,#14723d,#188149 50%,#14723d);border:2px solid rgba(255,255,255,.2)}
+.pitch:before{content:"";position:absolute;inset:7%;border:2px solid rgba(255,255,255,.7);border-radius:2px;pointer-events:none}
+.centerLine{position:absolute;left:7%;right:7%;top:50%;border-top:2px solid rgba(255,255,255,.7)}
+.centerCircle{position:absolute;width:136px;height:136px;border:2px solid rgba(255,255,255,.7);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+.teamHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.teamTitle{font-size:17px;font-weight:900}.teamScore{font-size:12px;color:var(--muted)}
+.slot{position:absolute;transform:translate(-50%,-50%);width:92px;min-height:68px;padding:6px;border-radius:12px;border:1px dashed rgba(255,255,255,.55);background:rgba(3,20,10,.26);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.slot.emptySlot{color:#fff;font-size:11px}.slot.filled{border-style:solid;background:rgba(5,22,14,.78);box-shadow:0 5px 16px rgba(0,0,0,.18)}
+.slot .num{font-size:10px;color:#b8d6c2}.slot .slotname{font-size:11px;font-weight:900;line-height:1.1}.slot .slotpos{font-size:9px;color:#b8d6c2}
+.bench{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}.benchItem{padding:8px 10px;border-radius:10px;background:#0b1728;border:1px solid var(--line);font-size:12px;font-weight:750}
+.feed{max-height:180px;overflow:auto;display:grid;gap:6px}.feed div{padding:8px 9px;border-radius:9px;background:#0b1728;color:#cbd6e5;font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+.modal.show{display:flex}.sheet{width:min(680px,100%);max-height:82vh;overflow:auto;background:#101d30;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 20px 70px #000}
+.sheet h3{margin:2px 0 10px}.choiceGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.choice{min-height:52px;background:#0b1728;border:1px solid var(--line);border-radius:11px;padding:9px;text-align:left;font-weight:800}.choice:active{background:#17304e}.close{width:100%;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#f5f7fb;color:#07111f;padding:11px 15px;border-radius:12px;font-weight:850;z-index:100;transition:.2s;box-shadow:0 8px 30px #0008}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.small{font-size:11px;color:var(--muted);line-height:1.35}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.pitch{min-height:650px}.pool{max-height:330px}}
+@media(max-width:560px){.app{padding:10px}.toolbar .btn{flex:1}.pitch{min-height:610px}.slot{width:76px;min-height:59px}.slot .slotname{font-size:10px}.choiceGrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">M&C</div><div><h1>Football Draft</h1><div class="sub">2 Spieler · Safari Edition</div></div></div>
+  <div class="toolbar">
+    <button class="btn" id="undoBtn" type="button">↩︎ Rückgängig</button>
+    <button class="btn danger" id="resetBtn" type="button">Neu starten</button>
+  </div>
+</header>
+
+<div class="grid">
+<section class="card">
+<h2>⚙️ Draft-Einstellungen</h2>
+<div class="cardbody setup">
+<div><label>Spieler 1</label><input id="team1Name" value="Spieler 1" autocomplete="off"></div>
+<div><label>Spieler 2</label><input id="team2Name" value="Spieler 2" autocomplete="off"></div>
+<div><label>Formation</label><select id="formation"><option value="433">4-3-3</option><option value="4231">4-2-3-1</option><option value="442">4-4-2</option></select></div>
+<button class="btn primary" id="startBtn" type="button">▶ Draft starten</button>
+<div class="status" id="status">Noch nicht gestartet</div>
+<hr style="width:100%;border:0;border-top:1px solid var(--line)">
+<h2 style="padding:0;border:0">➕ Spieler hinzufügen</h2>
+<div class="row"><input id="newName" placeholder="Spielername" autocomplete="off"><select id="newPos"><option>TW</option><option>LV</option><option>IV</option><option>RV</option><option>DM</option><option>ZM</option><option>OM</option><option>LA</option><option>RA</option><option>ST</option></select></div>
+<button class="btn blue" id="addBtn" type="button">+ Hinzufügen</button>
+<div class="small">Der neue Spieler erscheint direkt in der passenden Positionsliste.</div>
+</div>
+</section>
+
+<section class="card">
+<h2>👥 Spielerpool</h2>
+<div class="cardbody">
+<input id="search" placeholder="🔎 Spieler suchen..." autocomplete="off">
+<div style="height:8px"></div>
+<div class="positionTabs" id="tabs"></div>
+<div style="height:8px"></div>
+<div class="pool" id="pool"></div>
+</div>
+</section>
+</div>
+
+<section class="card" style="margin-top:12px">
+<div class="cardbody">
+<div class="teamHeader"><div class="teamTitle" id="teamTitle">Aufstellung</div><div class="teamScore" id="teamScore">0 / 11 Spieler</div></div>
+<div class="pitchWrap"><div class="pitch" id="pitch"><div class="centerLine"></div><div class="centerCircle"></div></div></div>
+<div class="teamHeader" style="margin-top:12px"><div class="teamTitle">🪑 Bank</div></div>
+<div class="bench" id="bench"><div class="empty">Noch keine Ersatzspieler</div></div>
+</div>
+</section>
+
+<section class="card" style="margin-top:12px;margin-bottom:18px">
+<h2>📜 Draft-Verlauf</h2><div class="cardbody"><div class="feed" id="feed"><div>Noch keine Picks.</div></div></div>
+</section>
+</div>
+
+<div class="modal" id="modal">
+<div class="sheet">
+<h3 id="modalTitle">Spieler auswählen</h3>
+<div class="choiceGrid" id="choices"></div>
+<button class="btn close" id="closeModal" type="button">Abbrechen</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+const POS=["TW","LV","IV","RV","DM","ZM","OM","LA","RA","ST"];
+const DEFAULT=[
+["Manuel Neuer","TW"],["Gregor Kobel","TW"],["Marc-André ter Stegen","TW"],
+["Alphonso Davies","LV"],["Theo Hernández","LV"],["Antonio Rüdiger","IV"],["Virgil van Dijk","IV"],["William Saliba","IV"],["Jonathan Tah","IV"],
+["Trent Alexander-Arnold","RV"],["Jeremie Frimpong","RV"],
+["Rodri","DM"],["Declan Rice","DM"],["Joshua Kimmich","ZM"],["Jude Bellingham","ZM"],["Florian Wirtz","OM"],["Jamal Musiala","OM"],
+["Vinícius Júnior","LA"],["Bukayo Saka","RA"],["Lamine Yamal","RA"],
+["Kylian Mbappé","ST"],["Erling Haaland","ST"],["Harry Kane","ST"]
+];
+
+const FORM={
+"433":[["TW",50,90],["LV",14,75],["IV",39,77],["IV",61,77],["RV",86,75],["ZM",29,54],["DM",50,57],["ZM",71,54],["LA",18,28],["ST",50,20],["RA",82,28]],
+"4231":[["TW",50,90],["LV",14,75],["IV",39,77],["IV",61,77],["RV",86,75],["DM",37,57],["DM",63,57],["LA",18,33],["OM",50,31],["RA",82,33],["ST",50,17]],
+"442":[["TW",50,90],["LV",14,75],["IV",39,77],["IV",61,77],["RV",86,75],["LA",19,53],["ZM",40,55],["ZM",60,55],["RA",81,53],["ST",40,25],["ST",60,25]]
+};
+
+let state={
+players:DEFAULT.map((x,i)=>({id:"p"+i,name:x[0],pos:x[1]})),
+formation:"433",teams:[{name:"Spieler 1",slots:Array(11).fill(null),bench:[]},{name:"Spieler 2",slots:Array(11).fill(null),bench:[]}],
+turn:0,started:false,history:[],activePos:"ALLE",search:"",selected:null
+};
+
+const $=id=>document.getElementById(id);
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove("show"),1800)}
+function persist(){try{localStorage.setItem("mcDraftSafari",JSON.stringify(state));}catch(e){}}
+function restore(){try{const x=localStorage.getItem("mcDraftSafari");if(x){const y=JSON.parse(x);if(y&&y.players&&y.teams)state=y;}}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+function renderTabs(){
+  const tabs=$("tabs");tabs.innerHTML="";
+  ["ALLE",...POS].forEach(p=>{const b=document.createElement("button");b.type="button";b.className="tab"+(state.activePos===p?" active":"");b.textContent=p;b.onclick=()=>{state.activePos=p;renderPool()};tabs.appendChild(b)})
+}
+function renderPool(){
+  const q=state.search.trim().toLowerCase();
+  const arr=state.players.filter(p=>(state.activePos==="ALLE"||p.pos===state.activePos)&&(!q||p.name.toLowerCase().includes(q)));
+  const picked=new Set();
+  state.teams.forEach(t=>t.slots.concat(t.bench).forEach(p=>{if(p)picked.add(p.id)}));
+  const pool=$("pool");pool.innerHTML="";
+  if(!arr.length){pool.innerHTML='<div class="empty">Keine Spieler gefunden.</div>';return}
+  arr.forEach(p=>{
+    const d=document.createElement("div");d.className="player"+(picked.has(p.id)?"":" available");
+    d.innerHTML='<div><div class="pname">'+esc(p.name)+'</div><div class="ppos">'+esc(p.pos)+(picked.has(p.id)?" · bereits gewählt":"")+'</div></div>';
+    if(!picked.has(p.id))d.onclick=()=>openPlayer(p.id);
+    pool.appendChild(d);
+  });
+}
+function renderPitch(){
+  const t=state.teams[state.turn];$("teamTitle").textContent=t.name+" – aktuelle Aufstellung";
+  $("teamScore").textContent=t.slots.filter(Boolean).length+" / 11 Spieler";
+  const pitch=$("pitch");pitch.querySelectorAll(".slot").forEach(x=>x.remove());
+  const layout=FORM[state.formation];
+  layout.forEach((x,i)=>{
+    const d=document.createElement("button");d.type="button";d.className="slot "+(t.slots[i]?"filled":"emptySlot");d.style.left=x[1]+"%";d.style.top=x[2]+"%";
+    const p=t.slots[i];
+    d.innerHTML=p?'<div class="num">'+esc(x[0])+'</div><div class="slotname">'+esc(p.name)+'</div><div class="slotpos">'+esc(p.pos)+'</div>':'<div>＋</div><div>'+esc(x[0])+'</div>';
+    d.onclick=()=>p?toast(p.name+" ist bereits auf dieser Position"):chooseForSlot(i);
+    pitch.appendChild(d);
+  });
+  const b=$("bench");b.innerHTML="";
+  if(!t.bench.length){b.innerHTML='<div class="empty">Noch keine Ersatzspieler</div>'}
+  else t.bench.forEach(p=>{const d=document.createElement("div");d.className="benchItem";d.textContent=p.name+" · "+p.pos;b.appendChild(d)});
+}
+function renderStatus(){
+  $("status").innerHTML=state.started?("Am Zug: <span class='turn'>"+esc(state.teams[state.turn].name)+"</span>"): "Noch nicht gestartet";
+  $("formation").value=state.formation;$("team1Name").value=state.teams[0].name;$("team2Name").value=state.teams[1].name;
+}
+function renderFeed(){
+  const f=$("feed");f.innerHTML="";
+  if(!state.history.length){f.innerHTML="<div>Noch keine Picks.</div>";return}
+  state.history.slice().reverse().forEach(h=>{const d=document.createElement("div");d.textContent=h;f.appendChild(d)})
+}
+function render(){renderTabs();renderPool();renderPitch();renderStatus();renderFeed();persist()}
+
+function pickedIds(){const s=new Set();state.teams.forEach(t=>t.slots.concat(t.bench).forEach(p=>p&&s.add(p.id)));return s}
+function openPlayer(id){
+  if(!state.started){toast("Erst „Draft starten“ drücken.");return}
+  const p=state.players.find(x=>x.id===id);if(!p)return;
+  state.selected=p;showChoicesForPlayer(p);
+}
+function showChoicesForPlayer(p){
+  $("modalTitle").textContent=p.name+" – wohin?";
+  const c=$("choices");c.innerHTML="";
+  const layout=FORM[state.formation];
+  layout.forEach((x,i)=>{if(!state.teams[state.turn].slots[i]&&x[0]===p.pos){const b=document.createElement("button");b.className="choice";b.type="button";b.textContent=x[0]+" · Platz "+(i+1);b.onclick=()=>pick(p,i,false);c.appendChild(b)}});
+  const bench=document.createElement("button");bench.className="choice";bench.type="button";bench.textContent="🪑 Auf die Bank";bench.onclick=()=>pick(p,-1,true);c.appendChild(bench);
+  $("modal").classList.add("show");
+}
+function chooseForSlot(i){
+  if(!state.started){toast("Erst „Draft starten“ drücken.");return}
+  const t=state.teams[state.turn],taken=pickedIds(),needed=FORM[state.formation][i][0];
+  const choices=state.players.filter(p=>!taken.has(p.id)&&p.pos===needed);
+  $("modalTitle").textContent="Spieler für "+needed+" auswählen";
+  const c=$("choices");c.innerHTML="";
+  choices.forEach(p=>{const b=document.createElement("button");b.className="choice";b.type="button";b.textContent=p.name;b.onclick=()=>pick(p,i,false);c.appendChild(b)});
+  if(!choices.length)c.innerHTML='<div class="empty">Keine freien Spieler für diese Position.</div>';
+  $("modal").classList.add("show");
+}
+function pick(p,slot,bench){
+  $("modal").classList.remove("show");
+  const t=state.teams[state.turn];
+  if(slot>=0)t.slots[slot]=p;else t.bench.push(p);
+  state.history.push(t.name+" wählt "+p.name+" ("+p.pos+")"+(bench?" auf die Bank":""));
+  state.turn=state.turn===0?1:0;
+  render();toast(p.name+" gewählt");
+}
+function undo(){
+  const h=state.history.pop();if(!h){toast("Nichts rückgängig zu machen.");return}
+  state.turn=state.turn===0?1:0;
+  const name=h.split(" wählt ")[1].split(" (")[0];
+  const t=state.teams[state.turn];
+  let removed=false;
+  for(let i=0;i<t.slots.length;i++){if(t.slots[i]&&t.slots[i].name===name){t.slots[i]=null;removed=true;break}}
+  if(!removed){const i=t.bench.findIndex(p=>p.name===name);if(i>=0)t.bench.splice(i,1)}
+  render();toast("Letzten Pick rückgängig");
+}
+function start(){
+  state.teams[0].name=$("team1Name").value.trim()||"Spieler 1";
+  state.teams[1].name=$("team2Name").value.trim()||"Spieler 2";
+  state.formation=$("formation").value;
+  state.started=true;state.turn=0;state.history=[];state.teams.forEach(t=>{t.slots=Array(11).fill(null);t.bench=[]});
+  render();toast("Draft gestartet – "+state.teams[0].name+" beginnt");
+}
+function addPlayer(){
+  const name=$("newName").value.trim(),pos=$("newPos").value;
+  if(!name){toast("Bitte einen Spielernamen eingeben.");$("newName").focus();return}
+  if(state.players.some(p=>p.name.toLowerCase()===name.toLowerCase())){toast("Diesen Spieler gibt es schon.");return}
+  state.players.push({id:"p"+Date.now()+Math.random().toString(16).slice(2),name,pos});
+  $("newName").value="";state.activePos=pos;render();toast(name+" hinzugefügt");
+}
+function reset(){
+  state= {players:DEFAULT.map((x,i)=>({id:"p"+i,name:x[0],pos:x[1]})),formation:"433",teams:[{name:"Spieler 1",slots:Array(11).fill(null),bench:[]},{name:"Spieler 2",slots:Array(11).fill(null),bench:[]}],turn:0,started:false,history:[],activePos:"ALLE",search:"",selected:null};
+  try{localStorage.removeItem("mcDraftSafari")}catch(e){};render();toast("Draft zurückgesetzt");
+}
+
+$("startBtn").addEventListener("click",start);
+$("addBtn").addEventListener("click",addPlayer);
+$("undoBtn").addEventListener("click",undo);
+$("resetBtn").addEventListener("click",reset);
+$("closeModal").addEventListener("click",()=>$("modal").classList.remove("show"));
+$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("show")});
+$("search").addEventListener("input",e=>{state.search=e.target.value;renderPool()});
+$("formation").addEventListener("change",e=>{state.formation=e.target.value;renderPitch();persist()});
+$("team1Name").addEventListener("change",()=>{state.teams[0].name=$("team1Name").value||"Spieler 1";renderStatus();persist()});
+$("team2Name").addEventListener("change",()=>{state.teams[1].name=$("team2Name").value||"Spieler 2";renderStatus();persist()});
+$("newName").addEventListener("keydown",e=>{if(e.key==="Enter")addPlayer()});
+
+restore();render();
+})();
+</script>
+</body>
+</html>
